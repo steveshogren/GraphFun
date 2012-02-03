@@ -1,4 +1,6 @@
 __author__ = 'jack'
+from os.path import exists
+from subprocess import call
 
 G = {
     'A': {'B': 10, 'D': 4, 'F': 10},
@@ -9,7 +11,7 @@ G = {
     'F': {'H': 3},
     'G': {'J': 3},
     'H': {'G': 3, 'J': 5},
-    'I': {'F':4},
+    'I': {},
     'J': {'I': 8},
     }
 
@@ -19,6 +21,14 @@ def printInGraphViz(G):
        for u, weight in pointsTo.items():
            dotContents += v + ' -> ' + u + ' [label=' + str(weight) + '];'
 
-    print dotContents
+    return dotContents
 
-printInGraphViz(G)
+dotFile = 'dotTemp.dot'
+f= open(dotFile, 'w')
+f.write('digraph G {' +  printInGraphViz(G) + '}')
+f.close()
+output_file = 'graph.png'
+if exists(output_file):
+    call(['rm', output_file])
+call(['dot', '-Tpng', dotFile, '-o' + output_file])
+
