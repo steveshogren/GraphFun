@@ -18,10 +18,11 @@ G = {
 def printInGraphViz(G):
     dotContents = '';
     for v, pointsTo  in G.items():
-       for u, weight in pointsTo.items():
-           dotContents += v + ' -> ' + u + ' [label=' + str(weight) + '];'
+        for u, weight in pointsTo.items():
+            dotContents += v + ' -> ' + u + ' [label=' + str(weight) + '];'
 
     return dotContents
+
 
 def printPathInGraphViz(G, start, end):
     dotContents = '';
@@ -35,44 +36,44 @@ def printPathInGraphViz(G, start, end):
 
     return dotContents
 
-def Dijkstra(G, source, end):
+
+def Dijkstra(G, start, end):
     dist = {}
     previous = {}
     for v in G.keys():
-        dist[v] = -1
-        previous[v] = ""
-    dist[source] = 0
+        dist[v] = float('inf')
+        previous[v] = None
+    dist[start] = 0
     unseen_nodes = G.keys()
+    # calculate the shortest path from every node to the start
     while len(unseen_nodes) > 0:
         shortest = None
-        node = ''
+        u = ''
         for temp_node in unseen_nodes:
-           if shortest == None:
-               shortest = dist[temp_node]
-               node = temp_node
-           elif dist[temp_node] < shortest:
-               shortest = dist[temp_node]
-               node = temp_node
-        unseen_nodes.remove(node)
+            if shortest is None:
+                shortest = dist[temp_node]
+                u = temp_node
+            elif dist[temp_node] < shortest:
+                shortest = dist[temp_node]
+                u = temp_node
+        unseen_nodes.remove(u)
 
-        for child_node, child_value in G[node].items():
-            if dist[child_node] < dist[node] + child_value:
-                dist[child_node] = dist[node] + child_value
-                previous[child_node] = node
+        for v, child_dist in G[u].items():
+            alt = dist[u] + child_dist
+            if dist[v] > alt:
+                dist[v] = alt
+                previous[v] = u
     path = []
-    node = end
-    while not (node == source):
-        if path.count(node) == 0:
-            path.insert(0, node)
-            node = previous[node]
-        else:
-            break
-    path.insert(0, source)
+    u = end
+    while previous[u] is not None:
+        path.insert(0, u)
+        u = previous[u]
+    path.insert(0, start)
     return path
 
 dotFile = 'dotTemp.dot'
-f= open(dotFile, 'w')
-f.write('digraph G {' +  printPathInGraphViz(G, 'C', 'I') + '}')
+f = open(dotFile, 'w')
+f.write('digraph G {' + printPathInGraphViz(G, 'C', 'I') + '}')
 f.close()
 output_file = 'graph.png'
 if exists(output_file):
